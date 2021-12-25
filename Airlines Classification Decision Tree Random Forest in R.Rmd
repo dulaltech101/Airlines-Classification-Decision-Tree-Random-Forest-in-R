@@ -1,0 +1,114 @@
+---
+title: "North American Airlines"
+output: html_notebook
+---
+
+# 
+
+# 
+
+**By: Durga P. Dula**l
+
+| **Context:**
+
+-   Your new job is with North American Airlines, an airline company that operates all over the United States, Canada, and Mexico. You have been hired because of your skills in Predictive Analytics. As your first task, your supervisor gave you the attached CSV file (allData.csv) that contains data about customers and whether they [**are satisfied or dissatisfied**]{.ul} with a recent flight that they took. This data has been collected by surveying customers. She wants a predictive model that she can use in the future to tell in advance whether a particular customer will be satisfied or not. One of your colleagues heard about the CRISP-DM methodology and divided the data in allData.csv into two files named trainingData.csv and testingData.csv. All these three files are available to you.
+
+# 
+
+| **Objective:**
+
+-   **To predictive model that can use in the future to tell in advance whether a particular customer will be satisfied or not.**
+
+**Data Dictionary:**
+
+```{r}
+names(allData)
+```
+
+### **Exploratory Data Analysis:**
+
+# 
+
+```{r}
+#view the data
+head(allData)
+```
+
+```{r}
+#lets check the data summary 
+summary(allData)
+```
+
+```{r}
+#lets view the structure of the variable 
+str(allData)
+```
+
+# 
+
+```{r}
+#view traning dataset
+head(trainingData)
+```
+
+```{r}
+#view testing dataset
+head(testingData)
+```
+
+### **Model Building:**
+
+**Decision Tree :**
+
+:   -   Decision Tree is a supervised learning technique where internal nodes represent the features of a data set, branches represent the decision rules, and each leaf node represents the outcome.
+
+```{r}
+# Build a CTree model and compute accuracies
+library("party")
+ctModel <- ctree(satisfaction~.,data=trainingData)
+library("caret")
+confusionMatrix(predict(ctModel),trainingData$satisfaction)
+```
+
+| **Observation** :  - Model is giving the accuracy of 92.9 % on the **training data** set.  - Let's **check the model on the testing data set** to see whether or not it can **generalize** the results.
+
+# 
+
+| **Testing**
+
+```{r}
+#checking the model performance on the testing dataset 
+
+confusionMatrix(predict(ctModel,newdata=testingData),testingData$satisfaction)
+```
+
+| **Observation :** - Model is giving the **accuracy of 92.1%** on the testing data set
+| - Model is giving similar results in testing data set. Hence, the model is able to generalized
+
+**Random Forest :**
+
+:   Random Forest is a supervised machine learning algorithm which can be used for both classification and regression. In classification, problem voting is done by each tree and the most voted class is considered the final result whereas in case of regression the average method is used to get the final outcome.
+
+```{r}
+# Build a Random Forest Model and compute accuracies
+
+library("randomForest")
+set.seed(123)
+rfModel <- randomForest(satisfaction~.,data=trainingData)
+confusionMatrix(predict(rfModel),trainingData$satisfaction)
+```
+
+| **Observation** :  - Model is giving the accuracy of 93.28% on the **training data** set.  - Let's **check the model performance on the testing data set**
+
+```{r}
+##checking the model performance on testing dataset 
+confusionMatrix(predict(rfModel,newdata=testingData),testingData$satisfaction)
+```
+
+| **Observation** :  - Model is giving the accuracy of 94.85% on the **Testing** dataset.  - Random forest gives higher accuracy in the on both training and testing data set in comparison to the previous model (Decision Tree)
+
+# 
+
+| **Conclusion:** - As model \#2 (Random Forest) gives higher accuracy in comparing to the model \#1 (Decision Tree). Hence, the Random Forest is more robust model in comparison to the Decision Tree on classifying satisfied vs not satisfied customer.
+
+| **Recommendation:** - While building the model, we can also find out our class of interest and evaluate the result based on it and select the best model (i.e., specifically look into recall or precision score) - We can also plot and find out important features - For better results/to make a better decision in the future, we can also try hyperparameter tunning of the trees.
